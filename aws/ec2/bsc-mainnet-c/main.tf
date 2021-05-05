@@ -89,6 +89,13 @@ resource "aws_instance" "instance" {
       "cd bsc/",
       "sudo wget -O geth https://github.com/binance-chain/bsc/releases/download/v1.0.7/geth_linux",
       "sudo chmod +x geth",
+
+      # Add a private key for syncing data
+      "sudo git clone https://github.com/massbitprotocol/node-worker-server.git",
+      "sudo cp node-worker-server/private.pem private.pem",
+      "sudo chmod 400 private.pem",
+      "echo 'Starting syncing'",
+      "nohup sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@13.211.177.53:bsc/node /node",
       
       # Main Net
       "sudo wget https://github.com/binance-chain/bsc/releases/download/v1.0.7/mainnet.zip",
@@ -96,12 +103,9 @@ resource "aws_instance" "instance" {
 
       # Write Gensis State locally
       "sudo ./geth --datadir node init genesis.json",
-
-      # Start fullnode
-      "echo 'Starting geth'",
-      "screen -dmS geth sudo ./geth --config ./config.toml --datadir ./node --pprofaddr 0.0.0.0 --metrics --pprof",
+      # "screen -dmS geth sudo ./geth --config ./config.toml --datadir ./node --pprofaddr 0.0.0.0 --metrics --pprof",
       # "nohup sudo ./geth --config ./config.toml --datadir ./node --pprofaddr 0.0.0.0 --metrics --pprof",
-      "sleep 5",
+      # "sleep 5",
     ]
   }
 
