@@ -95,6 +95,7 @@ resource "aws_instance" "instance" {
       "sudo cp node-worker-server/private.pem private.pem",
       "sudo chmod 400 private.pem",
       "echo 'Starting syncing'",
+      # Sync data from latest node (bsc-mainnet-a)
       "nohup sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@13.211.177.53:bsc/node /node",
       
       # Main Net
