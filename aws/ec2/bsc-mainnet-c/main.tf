@@ -95,11 +95,20 @@ resource "aws_instance" "instance" {
       "sudo cp node-worker-server/private.pem private.pem",
       "sudo chmod 400 private.pem",
       "echo 'Starting syncing'",
-      # Sync data from latest node (bsc-mainnet-a)
-      "nohup sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@13.211.177.53:bsc/node /node",
       
+      # Sync data externally from latest node (bsc-mainnet-a) 
+      # "nohup sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@13.211.177.53:bsc/node /node",
+      # "sleep 5",
+
+      # Sync data internally from latest node (bsc-mainnet-a)
+      "screen -dmS rsync sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@172.31.28.20:bsc/node /node",
+      "sleep 1",
+
+      # Sync from snapshot
+      # "sudo wget --no-check-certificate --no-proxy 'https://s3.ap-northeast-1.amazonaws.com/dex-bin.bnbstatic.com/s3-witness-data-download/chaindata_202103.zip?AWSAccessKeyId=AKIAYINE6SBQPUZDDRRO&Expires=1641450253&Signature=hOC8I8HSpCOytlYMVQwKRc5oUaI%3D'",
+
       # Main Net
-      "sudo wget https://github.com/binance-chain/bsc/releases/download/v1.0.7/mainnet.zip",
+      "sudo wget -b https://github.com/binance-chain/bsc/releases/download/v1.0.7/mainnet.zip",
       "sudo unzip mainnet.zip",
 
       # Write Gensis State locally
