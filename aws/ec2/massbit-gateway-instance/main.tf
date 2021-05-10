@@ -1,38 +1,19 @@
+#TODO: open port 443 HTTPS
+#Script to add certbot
+#Use these scripts to update worker IP from massbit or from a file https://github.com/massbitprotocol/key/tree/main/scripts
+
 variable "key_name" {
   type    = string
   default = "private" // Private key name should be private.pem
 }
 
-provider "aws" {
-  region = "ap-southeast-2" // Sydney
-}
-
-###################################
-# Environments for Massbit worker #
-###################################
 variable "app_name" {
   type    = string
-  # default = "bsc-proxy-worker-ABCD"
+  default = "massbit-gateway-instance"
 }
 
-variable "massbit_account" {
-  type    = string
-  # default = "UserName"
-}
-
-variable "massbit_proposal_id" {
-  type    = string
-  # default = "0"
-}
-
-variable "massbit_wss" {
-  type    = string
-  # default = "wss://dev-api.massbit.io/websocket"
-}
-
-variable "massbit_https" {
-  type    = string
-  # default = "https://dev-api.massbit.io/"
+provider "aws" {
+  region = "ap-southeast-2" // Sydney
 }
 
 ###########
@@ -49,7 +30,7 @@ resource "aws_security_group" "security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Allow talking to our nginx (interface of our blockchain)
+  // Allow Proxy Interface
   ingress { 
     from_port   = 80
     to_port     = 80
@@ -98,20 +79,8 @@ resource "aws_instance" "instance" {
       "sudo apt update",
       "sudo apt install -y ec2-instance-connect",
       "sudo apt install -y nginx",
-
-      # Updating Massbit worker environments
-      "echo -e '\nexport MASSBIT_ACCOUNT=${var.massbit_account}' >> ~/.profile",
-      "echo -e '\nexport MASSBIT_PROPOSAL_ID=${var.massbit_proposal_id}' >> ~/.profile",
-      "echo -e '\nexport MASSBIT_WSS=${var.massbit_wss}' >> ~/.profile",
-      "echo -e '\nexport MASSBIT_HTTPS =${var.massbit_https}' >> ~/.profile",
-
-      # Start nginx pointing to bsc mainnet and custom "bad strategy" handling for demo
-      "sudo git clone https://github.com/massbitprotocol/key",
-      "sudo rm /etc/nginx/sites-available/default",
-      "sudo cp key/nginx-config/bsc-testnet-proxy/default /etc/nginx/sites-available/default",
-
-      # TODO add script to reload every 5 hours here because it break sometimes
-      "sudo nginx -s reload",
+      # We will custom add certbot to add SSL for our nginx
+      # Use git to update new IP of massbit workers to nginx
     ]
   }
 

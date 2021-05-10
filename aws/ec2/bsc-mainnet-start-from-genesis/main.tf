@@ -1,3 +1,8 @@
+# TODO : need to add more port
+# Need to rewrite as systemctl service file
+# Use 5xzn 6xlarge instead of 2xlarge
+# Update geth version
+
 variable "key_name" {
   type    = string
   default = "private" // Private key name should be private.pem
@@ -27,8 +32,8 @@ resource "aws_security_group" "security_group" {
 
   # Allow talking to our blockchain
   ingress { 
-    from_port   = 6060
-    to_port     = 6060
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -90,7 +95,7 @@ resource "aws_instance" "instance" {
 
       # Start fullnode
       "echo 'Starting geth'",
-      "screen -dmS geth sudo ./geth --config ./config.toml --datadir ./node --pprofaddr 0.0.0.0 --metrics --pprof",
+      "sudo screen -dmS geth sudo ./geth --config ./config.toml --datadir ./node --pprofaddr 0.0.0.0 --metrics --pprof --rpc --rpccorsdomain '*' --rpcport 8545 --rpcvhosts '*' --cache=49152",
       "sleep 5",
     ]
   }

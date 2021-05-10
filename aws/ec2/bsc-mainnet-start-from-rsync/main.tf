@@ -1,3 +1,9 @@
+# TODO : need to add more port
+# Need to rewrite as systemctl service file
+# Use 5xzn 6xlarge instead of 2xlarge
+# Need test geth works after rsync
+# Update geth version
+
 variable "key_name" {
   type    = string
   default = "private" // Private key name should be private.pem

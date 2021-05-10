@@ -1,0 +1,2 @@
+sudo $HOME/.cargo/bin/cargo +nightly-2020-09-27 build --release 
+sudo ./target/release/node-template --dev --tmp --rpc-cors all

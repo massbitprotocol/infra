@@ -1,3 +1,6 @@
+# Todo: downgrade the machine a bit
+# Open more port
+
 variable "key_name" {
   type    = string
   default = "private" // Private key name should be private.pem
