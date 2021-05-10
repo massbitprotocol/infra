@@ -25,9 +25,14 @@ variable "massbit_proposal_id" {
   # default = "0"
 }
 
-variable "massbit_url" {
+variable "massbit_wss" {
   type    = string
   # default = "wss://dev-api.massbit.io/websocket"
+}
+
+variable "massbit_https" {
+  type    = string
+  # default = "https://dev-api.massbit.io/"
 }
 
 ###########
@@ -97,9 +102,10 @@ resource "aws_instance" "instance" {
       # Updating Massbit worker environments
       "echo -e '\nexport MASSBIT_ACCOUNT=${var.massbit_account}' >> ~/.profile",
       "echo -e '\nexport MASSBIT_PROPOSAL_ID=${var.massbit_proposal_id}' >> ~/.profile",
-      "echo -e '\nexport MASSBIT_URL=${var.massbit_url}' >> ~/.profile",
+      "echo -e '\nexport MASSBIT_WSS=${var.massbit_wss}' >> ~/.profile",
+      "echo -e '\nexport MASSBIT_HTTPS =${var.massbit_https}' >> ~/.profile",
 
-      # Start nginx pointing to bsc mainnet
+      # Start nginx pointing to bsc mainnet and custom "bad strategy" handling for demo
       "sudo git clone https://github.com/massbitprotocol/key",
       "sudo rm /etc/nginx/sites-available/default",
       "sudo cp key/nginx-config/bsc-testnet-proxy/default /etc/nginx/sites-available/default",
