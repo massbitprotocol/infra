@@ -66,7 +66,7 @@ resource "aws_security_group" "security_group" {
   }
 
   tags = {
-    Name = format("security-group-%s", var.app_name)
+    Name = format("%s", var.app_name)
   }
 }
 

@@ -1,20 +1,38 @@
-# TODO : need to add more port
-# Need to rewrite as systemctl service file
-# Use 5xzn 6xlarge instead of 2xlarge
-# Need test geth works after rsync
-# Update geth version
-
 variable "key_name" {
   type    = string
-  default = "private" // Private key name should be private.pem
-}
-
-variable "app_name" {
-  type    = string
+  default = "private" // Use the existing key in AWS
 }
 
 provider "aws" {
   region = "ap-southeast-2" // Sydney
+}
+
+###################################
+# Environments for Massbit worker #
+###################################
+variable "app_name" {
+  type    = string
+  default = "fullnode-from-ebs-snapshot"
+}
+
+variable "massbit_account" {
+  type    = string
+  default = "Hughie"
+}
+
+variable "massbit_proposal_id" {
+  type    = string
+  default = "0"
+}
+
+variable "massbit_wss" {
+  type    = string
+  default = "wss://dev-api.massbit.io/websocket"
+}
+
+variable "massbit_https" {
+  type    = string
+  default = "https://dev-api.massbit.io/"
 }
 
 ###########
@@ -31,10 +49,10 @@ resource "aws_security_group" "security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Allow talking to our blockchain
+  # Allow ingoing traffic to our nginx (RPC Server)
   ingress { 
-    from_port   = 6060
-    to_port     = 6060
+    from_port   = 80
+    to_port     = 80
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -46,16 +64,20 @@ resource "aws_security_group" "security_group" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  tags = {
+    Name = format("%s", var.app_name)
+  }
 }
 
 ############
 # Instance #
 ############
 resource "aws_instance" "instance" {
-  ami           = "ami-09b1eb4f62e1813d0" # singapore
-  instance_type = "m5.2xlarge"
+  ami           = "ami-0e7fcba3aae349b0b" // Ubuntu 18.04
+  instance_type = "m5.2xlarge" // This would cost 10$ a day
 
-  key_name = var.key_name // Use local key 
+  key_name = var.key_name 
 
   security_groups = [aws_security_group.security_group.name]
 
@@ -64,44 +86,66 @@ resource "aws_instance" "instance" {
   }
 
   root_block_device {
-    volume_size = 1000 // 1TB
-    volume_type = "gp2"
+    volume_size = 50 //GB
+    volume_type = "gp3"
+    tags = {
+      Name = format("%s", var.app_name)
+    }
   }
 
   connection {
     type        = "ssh"
     user        = "ubuntu"
-    private_key = file("private.pem")
+    private_key = file("private.pem") // An existing private key should exist inside the terraform folder so we can use remote-exec
     host        = aws_instance.instance.public_ip
   }
 
   provisioner "remote-exec" {
     inline = [
       "sudo apt update",
-      "sudo apt install -y unzip ec2-instance-connect",
-      "sudo apt-get install -y zip unzip",
+      "sudo apt install -y ec2-instance-connect", // Upgrade to Ubuntu 20.04 so we don't have to install ec2-instance-connect manually
+      "sudo apt install -y nginx", // BSC doesn't support HTTP-RPC yet, and the exisiting --rpc parameter from geth doesn't work well with CORs so we need nginx to expose the RPC server.
 
-      # Install BSC libraries
-      "sudo git clone https://github.com/binance-chain/bsc",
-      "cd bsc/",
-      "sudo wget -O geth https://github.com/binance-chain/bsc/releases/download/v1.0.7/geth_linux",
-      "sudo chmod +x geth",
-
-      # Main Net
-      "sudo wget https://github.com/binance-chain/bsc/releases/download/v1.0.7/mainnet.zip",
-      "sudo unzip mainnet.zip",
-
-      # Sync data externally from latest node (bsc-mainnet-a) 
+      # Sync data externally from a fully synced node
       # "screen -dmS external-rsync sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@13.211.177.53:bsc/node /node",
       # "sleep 5",
 
-      # Sync data internally from latest node (bsc-mainnet-a)
-      "screen -dmS internal-rsync sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@172.31.28.20:bsc/node /node",
+      # Sync data internally from a fully synced node
+      "screen -dmS internal-rsync sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@172.31.28.20:bsc /bsc",
       "sleep 5",
+
+      # Update Massbit worker environments
+      "echo '\nexport MASSBIT_ACCOUNT=${var.massbit_account}' >> ~/.profile",
+      "echo '\nexport MASSBIT_PROPOSAL_ID=${var.massbit_proposal_id}' >> ~/.profile",
+      "echo '\nexport MASSBIT_WSS=${var.massbit_wss}' >> ~/.profile",
+      "echo '\nexport MASSBIT_HTTPS=${var.massbit_https}' >> ~/.profile",
+
+      # Update Massbit worker environments for this shell
+      "export MASSBIT_ACCOUNT=${var.massbit_account}",
+      "export MASSBIT_PROPOSAL_ID=${var.massbit_proposal_id}",
+      "export MASSBIT_WSS=${var.massbit_wss}",
+      "export MASSBIT_HTTPS=${var.massbit_https}",
+
+      # Start nginx pointing to bsc testnet and custom "bad strategy" handling for demo
+      # "sudo git clone https://github.com/massbitprotocol/key",
+      # "sudo rm /etc/nginx/sites-available/default",
+      # "sudo cp key/nginx-config/bsc-testnet-proxy/default /etc/nginx/sites-available/default",
+      # "sudo nginx -s reload",
+
+      # Start Provider Agent
+      # "sudo apt update",
+      # "sudo apt install -y python3-pip",
+      # "pip3 install scalecodec",
+      # "pip3 install substrate-interface",
+      # "pip3 install apscheduler",
+      # "sudo git clone -b test_demo https://github.com/massbitprotocol/massbitprotocol",
+      # "cd massbitprotocol",
+      # "printenv | grep MASSBIT",
+      # "python3 worker_agent/provider/provider_agent.py"
     ]
   }
 
   tags = {
-    Name = format("ec2-%s", var.app_name)
+    Name = format("%s", var.app_name)
   }
 }
