@@ -1,0 +1,10 @@
+[Unit]
+Description=Nginx Reload with IPs from Massbit
+
+[Service]
+Type=simple
+WorkingDirectory=/etc/nginx/sites-available
+ExecStart=/usr/bin/python3 /etc/nginx/sites-available/update-workers-ip-to-nginx-from-massbit.py
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,9 @@
+[Unit]
+Description=Run update-worker-ip.service
+
+[Timer]
+OnBootSec=30
+OnUnitActiveSec=5
+
+[Install]
+WantedBy=timers.target

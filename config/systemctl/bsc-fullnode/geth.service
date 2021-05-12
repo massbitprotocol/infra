@@ -1,0 +1,12 @@
+[Unit]
+Description=BSC Geth
+
+[Service]
+Type=simple
+ExecStart=/home/ubuntu/bsc/geth --config /home/ubuntu/bsc/config.toml --datadir /home/ubuntu/bsc/node --pprofaddr 0.0.0.0 -metrics --pprof --rpc --rpccorsdomain '*' --rpcport 8545 --rpcvhosts '*' --cache=10240 --syncmode 'full'
+Restart=always
+# Restart after 3 hours to increase syncing time (maybe)
+RuntimeMaxSec=10800
+
+[Install]
+WantedBy=multi-user.target
