@@ -100,6 +100,8 @@ resource "aws_instance" "instance" {
       # "cd substrate_massbit",
       # "sudo apt install -y cargo",
 
+      # "script to build cargo",
+      # "sudo ./target/release/node-template --dev --tmp --rpc-cors all",
       # "sudo screen -dmS massbit make run",
       # "sudo make run",
     ]

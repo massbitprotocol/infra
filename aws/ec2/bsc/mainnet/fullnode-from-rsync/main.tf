@@ -1,4 +1,8 @@
-# To be removed, we will use vercel app 
+# TODO : need to add more port
+# Need to rewrite as systemctl service file
+# Use 5xzn 6xlarge instead of 2xlarge
+# Need test geth works after rsync
+# Update geth version
 
 variable "key_name" {
   type    = string
@@ -7,7 +11,6 @@ variable "key_name" {
 
 variable "app_name" {
   type    = string
-  default = "massbit-apps"
 }
 
 provider "aws" {
@@ -28,16 +31,10 @@ resource "aws_security_group" "security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Allow talking to our blockchain
   ingress { 
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress { 
-    from_port   = 3000
-    to_port     = 3000
+    from_port   = 6060
+    to_port     = 6060
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -55,8 +52,8 @@ resource "aws_security_group" "security_group" {
 # Instance #
 ############
 resource "aws_instance" "instance" {
-  ami           = "ami-0e7fcba3aae349b0b" # Ubuntu 18.04
-  instance_type = "t3.medium"
+  ami           = "ami-09b1eb4f62e1813d0" # singapore
+  instance_type = "m5.2xlarge"
 
   key_name = var.key_name // Use local key 
 
@@ -67,7 +64,7 @@ resource "aws_instance" "instance" {
   }
 
   root_block_device {
-    volume_size = 50 //GB
+    volume_size = 1000 // 1TB
     volume_type = "gp2"
   }
 
@@ -81,15 +78,26 @@ resource "aws_instance" "instance" {
   provisioner "remote-exec" {
     inline = [
       "sudo apt update",
-      "sudo apt install -y ec2-instance-connect",
-      "sudo apt install -y nginx",
+      "sudo apt install -y unzip ec2-instance-connect",
+      "sudo apt-get install -y zip unzip",
 
-      # automate script later 
-      # install yarn https://phoenixnap.com/kb/how-to-install-yarn-ubuntu
-      # install node
-      # curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
-      # sudo apt-get install -y nodejs
-      # sudo git clone https://github.com/massbitprotocol/massbit-apps 
+      # Install BSC libraries
+      "sudo git clone https://github.com/binance-chain/bsc",
+      "cd bsc/",
+      "sudo wget -O geth https://github.com/binance-chain/bsc/releases/download/v1.0.7/geth_linux",
+      "sudo chmod +x geth",
+
+      # Main Net
+      "sudo wget https://github.com/binance-chain/bsc/releases/download/v1.0.7/mainnet.zip",
+      "sudo unzip mainnet.zip",
+
+      # Sync data externally from latest node (bsc-mainnet-a) 
+      # "screen -dmS external-rsync sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@13.211.177.53:bsc/node /node",
+      # "sleep 5",
+
+      # Sync data internally from latest node (bsc-mainnet-a)
+      "screen -dmS internal-rsync sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@172.31.28.20:bsc/node /node",
+      "sleep 5",
     ]
   }
 

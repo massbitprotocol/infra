@@ -12,27 +12,27 @@ provider "aws" {
 ###################################
 variable "app_name" {
   type    = string
-  # default = "bsc-proxy-worker-ABCD"
+  default = "bsc-proxy-worker-Alice"
 }
 
 variable "massbit_account" {
   type    = string
-  # default = "UserName"
+  default = "Alice"
 }
 
 variable "massbit_proposal_id" {
   type    = string
-  # default = "0"
+  default = "0"
 }
 
 variable "massbit_wss" {
   type    = string
-  # default = "wss://dev-api.massbit.io/websocket"
+  default = "wss://dev-api.massbit.io/websocket"
 }
 
 variable "massbit_https" {
   type    = string
-  # default = "https://dev-api.massbit.io/"
+  default = "https://dev-api.massbit.io/"
 }
 
 ###########
@@ -100,18 +100,34 @@ resource "aws_instance" "instance" {
       "sudo apt install -y nginx",
 
       # Updating Massbit worker environments
-      "echo -e '\nexport MASSBIT_ACCOUNT=${var.massbit_account}' >> ~/.profile",
-      "echo -e '\nexport MASSBIT_PROPOSAL_ID=${var.massbit_proposal_id}' >> ~/.profile",
-      "echo -e '\nexport MASSBIT_WSS=${var.massbit_wss}' >> ~/.profile",
-      "echo -e '\nexport MASSBIT_HTTPS =${var.massbit_https}' >> ~/.profile",
+      "echo '\nexport MASSBIT_ACCOUNT=${var.massbit_account}' >> ~/.profile",
+      "echo '\nexport MASSBIT_PROPOSAL_ID=${var.massbit_proposal_id}' >> ~/.profile",
+      "echo '\nexport MASSBIT_WSS=${var.massbit_wss}' >> ~/.profile",
+      "echo '\nexport MASSBIT_HTTPS=${var.massbit_https}' >> ~/.profile",
 
-      # Start nginx pointing to bsc mainnet and custom "bad strategy" handling for demo
+      # Update for shell
+      "export MASSBIT_ACCOUNT=${var.massbit_account}",
+      "export MASSBIT_PROPOSAL_ID=${var.massbit_proposal_id}",
+      "export MASSBIT_WSS=${var.massbit_wss}",
+      "export MASSBIT_HTTPS=${var.massbit_https}",
+
+      # Start nginx pointing to bsc testnet and custom "bad strategy" handling for demo
       "sudo git clone https://github.com/massbitprotocol/key",
       "sudo rm /etc/nginx/sites-available/default",
       "sudo cp key/nginx-config/bsc-testnet-proxy/default /etc/nginx/sites-available/default",
-
-      # TODO add script to reload every 5 hours here because it break sometimes
       "sudo nginx -s reload",
+
+      # Start Provider Agent
+      "sudo apt update",
+      "sudo apt install -y python3-pip",
+      "pip3 install scalecodec",
+      "pip3 install substrate-interface",
+      "pip3 install apscheduler",
+      "sudo git clone -b test_demo https://github.com/massbitprotocol/massbitprotocol",
+      "cd massbitprotocol",
+
+      "printenv | grep MASSBIT",
+      "python3 worker_agent/provider/provider_agent.py"
     ]
   }
 
