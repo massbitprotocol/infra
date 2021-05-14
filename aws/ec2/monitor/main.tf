@@ -1,6 +1,6 @@
 variable "key_name" {
   type    = string
-  default = "private" // Private key name should be private.pem
+  default = "private" // Use the existing key in AWS
 }
 
 variable "app_name" {
@@ -82,17 +82,18 @@ resource "aws_instance" "instance" {
     inline = [
       "sudo apt update",
       "sudo apt install -y ec2-instance-connect",
-    #   "sudo apt install -y nginx",
+    #   "sudo apt install -y nginx", // Setup this to have HTTPS when we finalized our solution
 
       "sudo apt install -y apt-transport-https ca-certificates curl software-properties-common",
       "curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -",
       "sudo add-apt-repository 'deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable'",
       "sudo apt update",
       "apt-cache policy docker-ce",
-      "sudo apt install -y docker-ce",
+      "sudo apt install -y docker-ce docker-compose",
       "sudo git clone https://github.com/massbitprotocol/infra",
+      "sudo chmod -R a+w /var/lib/grafana/grafana.db" // Allow grafana to write to DB
       "cd infra/aws/ec2/monitor/docker",
-      "docker compose up -d"
+      "sudo docker-compose up -d"
     ]
   }
 
