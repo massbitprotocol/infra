@@ -1,0 +1,31 @@
+version: '2.2'
+
+services:
+
+  # geth:
+  #   image: chapsuk/geth:prometheus
+  #   container_name: dev_geth
+  #   ports:
+  #     - "10455:6060"
+  #     # - "10545:8545"
+  #   cpus: 0.3
+  #   command: --rinkeby --rpc --rpcaddr="0.0.0.0" --rpcvhosts="geth" --pprof --pprofaddr=0.0.0.0 --pprofport=6060 --metrics
+
+  grafana:
+    image: grafana/grafana
+    container_name: dev_geth_grafana
+    ports:
+      - "80:3000"
+    depends_on:
+      prometheus:
+        condition: service_started
+    volumes:
+      - ./grafana.db:/var/lib/grafana/grafana.db
+
+  prometheus:
+    image: prom/prometheus
+    container_name: dev_geth_prometheus
+    ports:
+      - "10008:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
