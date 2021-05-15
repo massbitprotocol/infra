@@ -12,7 +12,7 @@ provider "aws" {
 ###################################
 variable "app_name" {
   type    = string
-  default = "fullnode-from-genesis"
+  default = "eth-treenode-massbit"
 }
 
 variable "massbit_account" {
@@ -64,6 +64,14 @@ resource "aws_security_group" "security_group" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Temporary allow calling to debug metrics
+  ingress { 
+    from_port   = 6060
+    to_port     = 6060
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # Allow outgoing traffic to anywhere.
   egress {
     from_port   = 0
@@ -110,6 +118,11 @@ resource "aws_instance" "instance" {
       "sudo apt install -y ec2-instance-connect",
       "sudo apt install -y nginx",
 
+      # Install ethereum geth
+      "sudo add-apt-repository -y ppa:ethereum/ethereum",
+      "sudo apt-get update",
+      "sudo apt-get -y install ethereum",
+
       # Updating Massbit worker environments
       "echo '\nexport MASSBIT_ACCOUNT=${var.massbit_account}' >> ~/.profile",
       "echo '\nexport MASSBIT_PROPOSAL_ID=${var.massbit_proposal_id}' >> ~/.profile",
@@ -141,8 +154,8 @@ resource "aws_instance" "instance" {
 
       # Start fullnode
       "echo 'Starting geth'",
-      # "sudo screen -dmS geth sudo ./geth --datadir ./node --pprofaddr 0.0.0.0 --metrics --pprof ----http --http.corsdomain '*' --http.vhosts '*' --http.port 8545 --cache=8192",
-      "sudo ./geth --datadir ./node --pprof.addr 0.0.0.0 --metrics --pprof --http --http.corsdomain '*' --http.vhosts '*' --http.port 8545 --cache=8192",
+      # "sudo screen -dmS geth sudo /usr/bin/geth --datadir ./node --pprof --pprof.addr 0.0.0.0 --metrics  --http --http.corsdomain '*' --http.vhosts '*' --http.port 8545 --cache=8192",
+      "sudo /usr/bin/geth --datadir ./node --pprof --pprof.addr 0.0.0.0 --metrics  --http --http.corsdomain '*' --http.vhosts '*' --http.port 8545 --cache=8192",
       "sleep 5",
     ]
   }
