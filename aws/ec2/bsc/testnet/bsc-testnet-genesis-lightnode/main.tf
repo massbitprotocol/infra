@@ -105,11 +105,7 @@ resource "aws_instance" "instance" {
       "screen -dmS geth sudo ./geth --config ./config.toml --datadir ./node --pprofaddr 0.0.0.0 --metrics --pprof --rpc --rpccorsdomain '*' --rpcport 8545 --rpcvhosts '*' --syncmode 'light'",
       "sleep 5",
 
-      # Start nginx to proxy pass to our blockchain RPC server
-      "sudo git clone https://github.com/massbitprotocol/key",
-      "sudo rm /etc/nginx/sites-available/default",
-      "sudo cp key/default /etc/nginx/sites-available/default",
-      "sudo nginx -s reload",
+      # Not done. To be updated
     ]
   }
 

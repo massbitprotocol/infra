@@ -125,23 +125,7 @@ resource "aws_instance" "instance" {
       "export MASSBIT_WSS=${var.massbit_wss}",
       "export MASSBIT_HTTPS=${var.massbit_https}",
 
-      # Start nginx pointing to bsc testnet and custom "bad strategy" handling for demo
-      # "sudo git clone https://github.com/massbitprotocol/key",
-      # "sudo rm /etc/nginx/sites-available/default",
-      # "sudo cp key/nginx-config/bsc-testnet-proxy/default /etc/nginx/sites-available/default",
-      # "sudo nginx -s reload",
-
-      # Start Provider Agent
-      # "sudo apt update",
-      # "sudo apt install -y python3-pip",
-      # "pip3 install scalecodec",
-      # "pip3 install substrate-interface",
-      # "pip3 install apscheduler",
-      # "sudo git clone -b test_demo https://github.com/massbitprotocol/massbitprotocol",
-      # "cd massbitprotocol",
-      # "printenv | grep MASSBIT",
-      # ". ~/.profile",
-      # "python3 worker_agent/provider/provider_agent.py"
+      # Not done. To be updated
     ]
   }
 

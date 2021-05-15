@@ -112,9 +112,9 @@ resource "aws_instance" "instance" {
       "export MASSBIT_HTTPS=${var.massbit_https}",
 
       # Start nginx pointing to bsc testnet and custom "bad strategy" handling for demo
-      "sudo git clone https://github.com/massbitprotocol/key",
+      "sudo git clone https://github.com/massbitprotocol/infra",
       "sudo rm /etc/nginx/sites-available/default",
-      "sudo cp key/nginx-config/bsc-testnet-proxy/default /etc/nginx/sites-available/default",
+      "sudo cp infra/aws/ec2/bsc/mainnet/bsc-proxy/nginx-config/ /etc/nginx/sites-available/default",
       "sudo nginx -s reload",
 
       # Start Provider Agent

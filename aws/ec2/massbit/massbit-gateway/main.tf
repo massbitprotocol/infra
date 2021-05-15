@@ -1,6 +1,5 @@
 #TODO: open port 443 HTTPS
 #Script to add certbot
-#Use these scripts to update worker IP from massbit or from a file https://github.com/massbitprotocol/key/tree/main/scripts
 
 variable "key_name" {
   type    = string
@@ -81,6 +80,7 @@ resource "aws_instance" "instance" {
       "sudo apt install -y nginx",
       # We will custom add certbot to add SSL for our nginx
       # Use git to update new IP of massbit workers to nginx
+      # Not done. To be updated
     ]
   }
 
