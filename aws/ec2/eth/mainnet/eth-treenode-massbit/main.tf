@@ -154,8 +154,7 @@ resource "aws_instance" "instance" {
 
       # Start fullnode
       "echo 'Starting geth'",
-      # "sudo screen -dmS geth sudo /usr/bin/geth --datadir ./node --pprof --pprof.addr 0.0.0.0 --metrics  --http --http.corsdomain '*' --http.vhosts '*' --http.port 8545 --cache=8192",
-      "sudo /usr/bin/geth --datadir ./node --pprof --pprof.addr 0.0.0.0 --metrics  --http --http.corsdomain '*' --http.vhosts '*' --http.port 8545 --cache=8192",
+      "sudo screen -dmS geth sudo /usr/bin/geth --datadir ./node --pprof --pprof.addr 0.0.0.0 --metrics  --http --http.corsdomain '*' --http.vhosts '*' --http.port 8545 --cache=8192",
       "sleep 5",
     ]
   }
