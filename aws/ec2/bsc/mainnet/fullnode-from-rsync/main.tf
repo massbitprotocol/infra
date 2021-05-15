@@ -12,7 +12,7 @@ provider "aws" {
 ###################################
 variable "app_name" {
   type    = string
-  default = "fullnode-from-ebs-snapshot"
+  default = "fullnode-from-rsync"
 }
 
 variable "massbit_account" {
@@ -33,6 +33,14 @@ variable "massbit_wss" {
 variable "massbit_https" {
   type    = string
   default = "https://dev-api.massbit.io/"
+}
+
+variable "massbit_git_user" {
+  type    = string
+}
+
+variable "massbit_git_password" {
+  type    = string
 }
 
 ###########
@@ -86,7 +94,7 @@ resource "aws_instance" "instance" {
   }
 
   root_block_device {
-    volume_size = 50 //GB
+    volume_size = 1000 //GB
     volume_type = "gp3"
     tags = {
       Name = format("%s", var.app_name)
@@ -105,6 +113,10 @@ resource "aws_instance" "instance" {
       "sudo apt update",
       "sudo apt install -y ec2-instance-connect", // Upgrade to Ubuntu 20.04 so we don't have to install ec2-instance-connect manually
       "sudo apt install -y nginx", // BSC doesn't support HTTP-RPC yet, and the exisiting --rpc parameter from geth doesn't work well with CORs so we need nginx to expose the RPC server.
+
+      # Get target node private key with Massbit Github account
+      "sudo git clone https://${var.massbit_git_user}:${var.massbit_git_password}@github.com/massbitprotocol/key.git",
+      "cp key/ssh-key/private.pem private.pem",
 
       # Sync data externally from a fully synced node
       # "screen -dmS external-rsync sudo rsync -azvv -e 'ssh -o StrictHostKeyChecking=no -i private.pem' ubuntu@13.211.177.53:bsc/node /node",
@@ -142,6 +154,8 @@ resource "aws_instance" "instance" {
       # "cd massbitprotocol",
       # "printenv | grep MASSBIT",
       # "python3 worker_agent/provider/provider_agent.py"
+
+      
     ]
   }
 
