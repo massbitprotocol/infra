@@ -17,3 +17,4 @@ scrape_configs:
   static_configs:
   - targets:
     - bsc-treenode.massbit.io:6060
+    - eth-treenode.massbit.io:6060
