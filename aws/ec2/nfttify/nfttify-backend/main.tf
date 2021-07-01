@@ -91,7 +91,7 @@ resource "aws_instance" "instance" {
       "yarn install",
 
       // Todo: Reconfig package json from "set" to "export" to get NODE_ENV
-      "yarn run start:dev",
+      "sudo screen -dm bash -c 'export NODE_ENV=development; yarn run start:dev;'",
       
       // Todo: config /etc/nginx/sites-available to point to port 3000
       "sudo nginx -s reload",
