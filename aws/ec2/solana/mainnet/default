@@ -1,0 +1,18 @@
+upstream backend {
+    server api.mainnet-beta.solana.com;
+    server google.com;
+}
+
+server {
+        listen 80 default_server;
+        listen [::]:80 default_server;
+        root /var/www/html;
+        index index.html index.htm index.nginx-debian.html;
+
+        server_name _;
+
+        # Pointing to our blockchain RPC Server
+        location / {
+                proxy_pass http://backend;
+        }
+}

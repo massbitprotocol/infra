@@ -5,7 +5,7 @@ variable "key_name" {
 
 variable "app_name" {
   type    = string
-  default = "solana-proxy-a"
+  default = "solana-proxy"
 }
 
 provider "aws" {
