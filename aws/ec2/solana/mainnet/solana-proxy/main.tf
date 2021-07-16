@@ -80,7 +80,7 @@ resource "aws_instance" "instance" {
       # Config nginx to point to 
       "sudo git clone https://github.com/massbitprotocol/infra",
       "sudo rm /etc/nginx/sites-available/default",
-      "sudo cp infra/aws/ec2/solana/mainnet/solana-proxy/nginx-config/ /etc/nginx/sites-available/default",
+      "sudo cp infra/aws/ec2/solana/mainnet/solana-proxy/nginx-config/default /etc/nginx/sites-available/default",
       "sudo nginx -s reload",
     ]
   }
