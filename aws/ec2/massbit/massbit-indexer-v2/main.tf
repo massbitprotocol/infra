@@ -7,7 +7,7 @@ variable "key_name" {
 
 variable "app_name" {
   type    = string
-  default = "massbit-indexer"
+  default = "massbit-indexer-v2"
 }
 
 provider "aws" {
@@ -60,7 +60,7 @@ resource "aws_security_group" "security_group" {
 ############
 resource "aws_instance" "instance" {
   ami           = "ami-0e7fcba3aae349b0b" # Ubuntu 18.04
-  instance_type = "t3.medium"
+  instance_type = "t3.xlarge" // Refactor to use spot instance to save cost
 
   key_name = var.key_name // Use local key 
 
@@ -71,7 +71,7 @@ resource "aws_instance" "instance" {
   }
 
   root_block_device {
-    volume_size = 100 //GB
+    volume_size = 500 //GB. Solana is importing a lot of data, about 50-100GB a day
     volume_type = "gp2"
   }
 
