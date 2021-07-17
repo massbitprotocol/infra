@@ -60,7 +60,7 @@ resource "aws_security_group" "security_group" {
 ############
 resource "aws_instance" "instance" {
   ami           = "ami-0e7fcba3aae349b0b" # Ubuntu 18.04
-  instance_type = "t3.xlarge" // Refactor to use spot instance to save cost
+  instance_type = "m5.4xlarge" // Refactor to use spot instance to save cost
 
   key_name = var.key_name // Use local key 
 
