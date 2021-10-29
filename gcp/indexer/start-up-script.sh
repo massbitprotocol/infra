@@ -41,6 +41,8 @@ pip3 install -U ipfshttpclient && \
         apt-get clean -y 
 
 
+# rm ~/.ssh/known_hosts 
+
 # Run services in binary modes
 scp target/release/manager 35.246.162.228:./
 scp target/release/chain-reader 35.246.162.228:./
@@ -53,7 +55,7 @@ make init-test
 
 docker-compose -f docker-compose.min.yml up -d 
 
-make tmux-chain-reader
+make tmux-chain-reader-binary
 make tmux-indexer-v2-binary
 make tmux-code-compiler
 
