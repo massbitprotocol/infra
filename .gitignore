@@ -1,4 +1,5 @@
 private.pem
+token.json
 terraform.tfstate
 terraform.tfstate.backup
 .terraform

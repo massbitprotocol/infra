@@ -1,12 +1,12 @@
-terraform {
-  backend "remote" {
-    organization = "Massbit"
+# terraform {
+#   backend "remote" {
+#     organization = "Massbit"
 
-    workspaces {
-      name = "massbit"
-    }
-  }
-}
+#     workspaces {
+#       name = "massbit"
+#     }
+#   }
+# }
 
 provider "google" {  
   credentials = file("token.json")
@@ -17,7 +17,7 @@ provider "google" {
 
 
 resource "google_compute_instance" "default" {
-  name         = "harmony-indexer"
+  name         = "quickswap-indexer"
   machine_type = "e2-highcpu-2"
   zone         = "europe-west3-a"
 
@@ -46,7 +46,7 @@ resource "google_compute_instance" "default" {
   }
 
   metadata = {
-    foo = "bar"
+    foo = "indexer"
   }
 
   # metadata_startup_script = file("start-up-script.sh")
