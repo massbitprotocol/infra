@@ -18,7 +18,7 @@ provider "google" {
 
 resource "google_compute_instance" "default" {
   name         = "harmony-indexer"
-  machine_type = "e2-standard-2"
+  machine_type = "e2-highcpu-4"
   zone         = "europe-west3-a"
 
   tags = ["indexer"]
