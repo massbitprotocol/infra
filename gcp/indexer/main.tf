@@ -17,8 +17,8 @@ provider "google" {
 
 
 resource "google_compute_instance" "default" {
-  name         = "harmony-long-test"
-  machine_type = "e2-highcpu-4"
+  name         = "harmony-indexer"
+  machine_type = "e2-standard-2"
   zone         = "europe-west3-a"
 
   tags = ["indexer"]
@@ -49,7 +49,7 @@ resource "google_compute_instance" "default" {
     foo = "bar"
   }
 
-  metadata_startup_script = file("start-up-script.sh")
+  # metadata_startup_script = file("start-up-script.sh")
 
   service_account {
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
