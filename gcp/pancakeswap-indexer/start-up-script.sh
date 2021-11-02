@@ -44,8 +44,8 @@ pip3 install -U ipfshttpclient && \
 # rm ~/.ssh/known_hosts 
 
 # Run services in binary modes
-scp target/release/manager 35.234.107.24:./
-scp target/release/chain-reader 35.234.107.24:./
+scp target/release/manager 35.246.224.168:./
+scp target/release/chain-reader 335.246.224.168:./
 
 cp manager ./massbitprotocol/e2e-test
 cp chain-reader ./massbitprotocol/e2e-test
@@ -53,7 +53,7 @@ cd massbitprotocol
 make init-docker
 make init-test
 
-docker-compose -f docker-compose.min.yml up -d 
+docker-compose -f docker-compose.test.yml up -d 
 
 make tmux-chain-reader-binary
 make tmux-indexer-v2-binary
